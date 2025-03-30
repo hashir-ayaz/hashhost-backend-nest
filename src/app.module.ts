@@ -5,20 +5,21 @@ import { ServersModule } from './servers/servers.module';
 import { ProjectsModule } from './projects/projects.module';
 
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { PrebuiltResourceModule } from './prebuilt-resource/prebuilt-resource.module';
 
 const typeOrmConfig = TypeOrmModule.forRoot({
   type: 'postgres', // or 'mysql', 'sqlite', etc.
   host: 'localhost',
   port: 5432,
-  username: 'your_db_user',
-  password: 'your_db_password',
-  database: 'your_db_name',
+  username: 'postgres',
+  password: 'postgres',
+  database: 'nestdb',
   autoLoadEntities: true, // auto imports all @Entity()s
   synchronize: true, // auto creates tables (disable in prod)
 });
 
 @Module({
-  imports: [ServersModule, ProjectsModule, typeOrmConfig],
+  imports: [ServersModule, ProjectsModule, typeOrmConfig, PrebuiltResourceModule],
   controllers: [AppController],
   providers: [AppService],
 })

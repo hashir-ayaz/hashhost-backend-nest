@@ -1,35 +1,37 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { Project } from '../projects/project.entity';
 
-@Entity()
+@Entity() // Explicitly naming the table to match Flask version
 export class Server {
-  constructor() {
-    this.createdAt = new Date();
-    this.updatedAt = new Date();
-  }
-
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({ type: 'varchar', length: 255, unique: true, nullable: true })
   name: string;
 
-  @Column()
+  @Column({ type: 'varchar', length: 500, default: '', nullable: true })
   description: string;
 
-  @Column()
-  ip_address: string;
+  @Column({ type: 'varchar', length: 45, nullable: true })
+  ip_address: string; // IPv4 + IPv6 support
 
-  @Column()
-  status: string;
+  @Column({ type: 'varchar', length: 50, default: 'inactive', nullable: false })
+  status: string; // active, inactive, maintenance
 
-  //   projects for this server
-  @OneToMany(() => Project, (project) => project.serverId)
+  // Relationship: one server can have many projects
+  @OneToMany(() => Project, (project) => project.server)
   projects: Project[];
 
-  @Column()
+  @CreateDateColumn({ name: 'created_at', type: 'timestamp with time zone' })
   createdAt: Date;
 
-  @Column()
+  @UpdateDateColumn({ name: 'updated_at', type: 'timestamp with time zone' })
   updatedAt: Date;
 }
