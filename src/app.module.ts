@@ -6,6 +6,7 @@ import { ProjectsModule } from './projects/projects.module';
 
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PrebuiltResourceModule } from './prebuilt-resource/prebuilt-resource.module';
+import { PrebuiltResourceInstanceModule } from './prebuilt-resource-instance/prebuilt-resource-instance.module';
 
 const typeOrmConfig = TypeOrmModule.forRoot({
   type: 'postgres', // or 'mysql', 'sqlite', etc.
@@ -19,7 +20,13 @@ const typeOrmConfig = TypeOrmModule.forRoot({
 });
 
 @Module({
-  imports: [ServersModule, ProjectsModule, typeOrmConfig, PrebuiltResourceModule],
+  imports: [
+    ServersModule,
+    ProjectsModule,
+    typeOrmConfig,
+    PrebuiltResourceModule,
+    PrebuiltResourceInstanceModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

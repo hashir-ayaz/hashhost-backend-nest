@@ -4,11 +4,12 @@ import {
   PrimaryGeneratedColumn,
   ManyToOne,
   JoinColumn,
+  OneToMany,
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { Server } from '../servers/server.entity';
-// import { PrebuiltResourceInstance } from '../prebuilt-resource-instances/prebuilt-resource-instance.entity';
+import { PrebuiltResourceInstance } from '../prebuilt-resource-instance/entities/prebuilt-resource-instance.entity';
 // import { UserBuiltInstance } from '../user-built-instances/user-built-instance.entity';
 
 @Entity() // Explicit table name
@@ -40,14 +41,9 @@ export class Project {
   @UpdateDateColumn({ name: 'updated_at', type: 'timestamp with time zone' })
   updatedAt: Date;
 
-  // Relations to resource instances
+  // // Relations to resource instances
   // @OneToMany(() => PrebuiltResourceInstance, (prebuilt) => prebuilt.project, {
   //   cascade: true,
   // })
-  // prebuilt_resources_instances: PrebuiltResourceInstance[];
-
-  // @OneToMany(() => UserBuiltInstance, (userBuilt) => userBuilt.project, {
-  //   cascade: true,
-  // })
-  // user_built_instances: UserBuiltInstance[];
+  // prebuiltResourceInstances: PrebuiltResourceInstance[];
 }
