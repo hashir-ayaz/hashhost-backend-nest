@@ -36,11 +36,47 @@ export class DockerService {
     return container.inspect();
   }
 
+  stopContainer(id: string) {
+    const container = this.docker.getContainer(id.toString());
+
+    if (!container) {
+      throw new Error(`Container with id ${id} not found`);
+    }
+
+    return container.stop();
+  }
+
+  startContainer(id: string) {
+    const container = this.docker.getContainer(id.toString());
+
+    if (!container) {
+      throw new Error(`Container with id ${id} not found`);
+    }
+
+    return container.start();
+  }
+
+  restartContainer(id: string) {
+    const container = this.docker.getContainer(id.toString());
+
+    if (!container) {
+      throw new Error(`Container with id ${id} not found`);
+    }
+
+    return container.restart();
+  }
+
   update(id: number) {
     return `This action updates a #${id} docker`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} docker`;
+  removeContainer(id: string) {
+    const container = this.docker.getContainer(id.toString());
+
+    if (!container) {
+      throw new Error(`Container with id ${id} not found`);
+    }
+
+    return container.remove();
   }
 }
