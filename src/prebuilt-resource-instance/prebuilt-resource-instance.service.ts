@@ -1,26 +1,38 @@
 import { Injectable } from '@nestjs/common';
 import { CreatePrebuiltResourceInstanceDto } from './dto/create-prebuilt-resource-instance.dto';
 import { UpdatePrebuiltResourceInstanceDto } from './dto/update-prebuilt-resource-instance.dto';
-
+import { Repository } from 'typeorm';
+import { PrebuiltResourceInstance } from './entities/prebuilt-resource-instance.entity';
+import { InjectRepository } from '@nestjs/typeorm';
 @Injectable()
 export class PrebuiltResourceInstanceService {
+  constructor(
+    @InjectRepository(PrebuiltResourceInstance)
+    private readonly prebuiltResourceInstanceRepo: Repository<PrebuiltResourceInstance>,
+  ) {}
+
   create(createPrebuiltResourceInstanceDto: CreatePrebuiltResourceInstanceDto) {
-    return 'This action adds a new prebuiltResourceInstance';
+    return this.prebuiltResourceInstanceRepo.save(
+      createPrebuiltResourceInstanceDto,
+    );
   }
 
   findAll() {
-    return `This action returns all prebuiltResourceInstance`;
+    return this.prebuiltResourceInstanceRepo.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} prebuiltResourceInstance`;
+  async findOne(id: number) {
+    await this.prebuiltResourceInstanceRepo.findOneByOrFail({ id: id });
   }
 
-  update(id: number, updatePrebuiltResourceInstanceDto: UpdatePrebuiltResourceInstanceDto) {
+  update(
+    id: number,
+    updatePrebuiltResourceInstanceDto: UpdatePrebuiltResourceInstanceDto,
+  ) {
     return `This action updates a #${id} prebuiltResourceInstance`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} prebuiltResourceInstance`;
+  async remove(id: number) {
+    return await this.prebuiltResourceInstanceRepo.delete({ id: id });
   }
 }

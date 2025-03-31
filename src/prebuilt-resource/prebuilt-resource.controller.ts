@@ -1,11 +1,21 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { PrebuiltResourceService } from './prebuilt-resource.service';
 import { CreatePrebuiltResourceDto } from './dto/create-prebuilt-resource.dto';
 import { UpdatePrebuiltResourceDto } from './dto/update-prebuilt-resource.dto';
 
 @Controller('prebuilt-resource')
 export class PrebuiltResourceController {
-  constructor(private readonly prebuiltResourceService: PrebuiltResourceService) {}
+  constructor(
+    private readonly prebuiltResourceService: PrebuiltResourceService,
+  ) {}
 
   @Post()
   create(@Body() createPrebuiltResourceDto: CreatePrebuiltResourceDto) {
@@ -23,12 +33,18 @@ export class PrebuiltResourceController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePrebuiltResourceDto: UpdatePrebuiltResourceDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updatePrebuiltResourceDto: UpdatePrebuiltResourceDto,
+  ) {
     return this.prebuiltResourceService.update(+id, updatePrebuiltResourceDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.prebuiltResourceService.remove(+id);
+    return {
+      data: this.prebuiltResourceService.remove(+id),
+      message: 'PrebuiltResource deleted successfully',
+    };
   }
 }
