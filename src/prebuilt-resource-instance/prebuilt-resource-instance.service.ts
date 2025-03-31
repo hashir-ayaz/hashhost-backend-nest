@@ -4,25 +4,33 @@ import { UpdatePrebuiltResourceInstanceDto } from './dto/update-prebuilt-resourc
 import { Repository } from 'typeorm';
 import { PrebuiltResourceInstance } from './entities/prebuilt-resource-instance.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { DockerService } from 'src/docker/docker.service';
 @Injectable()
 export class PrebuiltResourceInstanceService {
   constructor(
     @InjectRepository(PrebuiltResourceInstance)
     private readonly prebuiltResourceInstanceRepo: Repository<PrebuiltResourceInstance>,
+    private readonly dockerService: DockerService,
   ) {}
 
-  create(createPrebuiltResourceInstanceDto: CreatePrebuiltResourceInstanceDto) {
-    return this.prebuiltResourceInstanceRepo.save(
+  async create(
+    createPrebuiltResourceInstanceDto: CreatePrebuiltResourceInstanceDto,
+  ) {
+    await this.prebuiltResourceInstanceRepo.save(
       createPrebuiltResourceInstanceDto,
     );
+
+    await this.dockerService.createContainer();
+
+    return 'successfully made a busybox contianer';
   }
 
   findAll() {
     return this.prebuiltResourceInstanceRepo.find();
   }
 
-  async findOne(id: number) {
-    await this.prebuiltResourceInstanceRepo.findOneByOrFail({ id: id });
+  findOne(id: string) {
+    return this.dockerService.findOne(id);
   }
 
   update(

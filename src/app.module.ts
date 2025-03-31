@@ -7,6 +7,7 @@ import { ProjectsModule } from './projects/projects.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PrebuiltResourceModule } from './prebuilt-resource/prebuilt-resource.module';
 import { PrebuiltResourceInstanceModule } from './prebuilt-resource-instance/prebuilt-resource-instance.module';
+import { DockerModule } from './docker/docker.module';
 
 const typeOrmConfig = TypeOrmModule.forRoot({
   type: 'postgres', // or 'mysql', 'sqlite', etc.
@@ -26,6 +27,7 @@ const typeOrmConfig = TypeOrmModule.forRoot({
     typeOrmConfig,
     PrebuiltResourceModule,
     PrebuiltResourceInstanceModule,
+    DockerModule,
   ],
   controllers: [AppController],
   providers: [AppService],
