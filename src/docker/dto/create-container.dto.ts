@@ -1,5 +1,6 @@
 import { IsNotEmpty, IsOptional } from 'class-validator';
-export class CreatePrebuiltResourceInstanceDto {
+
+export class CreateContainer {
   @IsNotEmpty()
   Image: string;
 
@@ -9,7 +10,7 @@ export class CreatePrebuiltResourceInstanceDto {
   @IsOptional()
   Volume: Record<string, any>;
 
-  //   needs to have = beech mein
   @IsOptional()
+  //   needs to have = beech mein
   Env: string[];
 }

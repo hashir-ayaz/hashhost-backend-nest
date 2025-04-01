@@ -7,11 +7,7 @@ export class DockerService {
 
   createContainer() {
     return this.docker.createContainer({
-      Image: 'busybox',
-      Cmd: ['/bin/sh'],
-      Tty: true,
-      OpenStdin: true,
-      StdinOnce: true,
+      Image: 'ubuntu',
     });
   }
 
