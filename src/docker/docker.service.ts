@@ -6,7 +6,19 @@ import { CreateContainerDto } from './dto/create-container.dto';
 export class DockerService {
   docker = new Dockerode();
 
-  createContainer(createContainerDto: CreateContainerDto) {
+  async createContainer(createContainerDto: CreateContainerDto) {
+    // if image doesnt exist then pull the image first
+    const images = await this.findAllImages();
+    if (
+      images &&
+      !images.find(
+        (image) =>
+          image.RepoTags && image.RepoTags.includes(createContainerDto.Image),
+      )
+    ) {
+      await this.docker.pull(createContainerDto.Image);
+    }
+
     return this.docker.createContainer({
       Image: createContainerDto.Image,
       Cmd: createContainerDto.Cmd,
@@ -78,5 +90,9 @@ export class DockerService {
     }
 
     return container.remove();
+  }
+
+  findAllImages() {
+    return this.docker.listImages();
   }
 }

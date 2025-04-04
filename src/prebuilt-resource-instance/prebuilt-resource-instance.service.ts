@@ -59,6 +59,9 @@ export class PrebuiltResourceInstanceService {
     const createdContainer =
       await this.dockerService.createContainer(container);
 
+    await createdContainer.start();
+    console.log(`Container ${resource.image} started`);
+
     return createdContainer;
   }
 
