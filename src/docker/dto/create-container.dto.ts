@@ -1,16 +1,16 @@
 import { IsNotEmpty, IsOptional } from 'class-validator';
 
-export class CreateContainer {
+export class CreateContainerDto {
   @IsNotEmpty()
   Image: string;
 
   @IsOptional()
-  Cmd: string[];
+  Cmd?: string[];
 
   @IsOptional()
-  Volume: Record<string, any>;
+  Volume?: Record<string, object>;
 
+  //   needs to have = beech mein (eg API_URL=https://hashirayaz.site/api ) or that value will be ignored
   @IsOptional()
-  //   needs to have = beech mein
-  Env: string[];
+  Env?: string[];
 }

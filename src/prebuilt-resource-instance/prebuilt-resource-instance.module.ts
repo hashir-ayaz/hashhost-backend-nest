@@ -4,8 +4,12 @@ import { PrebuiltResourceInstanceController } from './prebuilt-resource-instance
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PrebuiltResourceInstance } from './entities/prebuilt-resource-instance.entity';
 import { DockerModule } from 'src/docker/docker.module';
+import { PrebuiltResource } from 'src/prebuilt-resource/entities/prebuilt-resource.entity';
 @Module({
-  imports: [TypeOrmModule.forFeature([PrebuiltResourceInstance]), DockerModule],
+  imports: [
+    TypeOrmModule.forFeature([PrebuiltResourceInstance, PrebuiltResource]),
+    DockerModule,
+  ],
   controllers: [PrebuiltResourceInstanceController],
   providers: [PrebuiltResourceInstanceService],
 })

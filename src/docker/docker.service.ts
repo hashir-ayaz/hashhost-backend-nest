@@ -1,13 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import * as Dockerode from 'dockerode';
+import { CreateContainerDto } from './dto/create-container.dto';
 
 @Injectable()
 export class DockerService {
   docker = new Dockerode();
 
-  createContainer() {
+  createContainer(createContainerDto: CreateContainerDto) {
     return this.docker.createContainer({
-      Image: 'ubuntu',
+      Image: createContainerDto.Image,
+      Cmd: createContainerDto.Cmd,
+      Volumes: createContainerDto.Volume,
+      Env: createContainerDto.Env,
     });
   }
 
