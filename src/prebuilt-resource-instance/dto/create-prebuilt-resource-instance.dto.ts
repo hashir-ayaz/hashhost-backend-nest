@@ -25,17 +25,19 @@ export class CreatePrebuiltResourceInstanceDto {
   @IsOptional()
   custom_config?: Record<string, any>;
 
-  @IsArray()
-  @IsNotEmpty()
-  assigned_ports: number[];
+  // @IsArray()
+  // @IsNotEmpty()
+  // assigned_ports: number[];
 
   @IsString()
   @IsOptional()
   assigned_server?: string; // defaults to "127.0.0.1"
 
-  @IsString()
   @IsOptional()
   volumes?: string[];
+
+  @IsOptional()
+  binds?: string[];
 
   @IsString()
   @IsOptional()

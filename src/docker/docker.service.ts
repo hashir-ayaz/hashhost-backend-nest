@@ -6,25 +6,34 @@ import { CreateContainerDto } from './dto/create-container.dto';
 export class DockerService {
   docker = new Dockerode();
 
-  async createContainer(createContainerDto: CreateContainerDto) {
-    // if image doesnt exist then pull the image first
-    const images = await this.findAllImages();
-    if (
-      images &&
-      !images.find(
-        (image) =>
-          image.RepoTags && image.RepoTags.includes(createContainerDto.Image),
-      )
-    ) {
-      await this.docker.pull(createContainerDto.Image);
-    }
+  async createContainer(dto: CreateContainerDto) {
+    try {
+      // if image doesnt exist then pull the image first
+      const images = await this.findAllImages();
+      if (
+        images &&
+        !images.find(
+          (image) => image.RepoTags && image.RepoTags.includes(dto.image),
+        )
+      ) {
+        await this.docker.pull(dto.image);
+      }
+      console.log('the volume being stored is of shape ', dto.volume);
 
-    return this.docker.createContainer({
-      Image: createContainerDto.Image,
-      Cmd: createContainerDto.Cmd,
-      Volumes: createContainerDto.Volume,
-      Env: createContainerDto.Env,
-    });
+      return this.docker.createContainer({
+        Image: dto.image,
+        Cmd: dto.cmd,
+        // the issue is in this volumessss
+        Volumes: dto.volume,
+        Env: dto.env,
+        HostConfig: {
+          Binds: dto.binds,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      throw new Error(`Failed to create container ${error}`);
+    }
   }
 
   //   lists all the docker containers on the current host machine

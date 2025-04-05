@@ -27,7 +27,7 @@ export class PrebuiltResource {
   @Column({ type: 'json', nullable: false, default: () => "'[]'" }) // JSON array like [80, 443]
   requiredPorts: number[];
 
-  @Column({ type: 'varchar', length: 255, nullable: true })
+  @Column({ type: 'json', nullable: true })
   volumePath: string[];
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamp with time zone' })

@@ -22,6 +22,7 @@ export class PrebuiltResourceInstanceController {
     @Body()
     createPrebuiltResourceInstanceDto: CreatePrebuiltResourceInstanceDto,
   ) {
+    console.log('in the prebuilt resource instance controller');
     return this.prebuiltResourceInstanceService.create(
       createPrebuiltResourceInstanceDto,
     );
