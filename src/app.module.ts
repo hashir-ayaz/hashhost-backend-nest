@@ -14,7 +14,7 @@ const typeOrmConfig = TypeOrmModule.forRoot({
   host: 'localhost',
   port: 5432,
   username: 'postgres',
-  password: 'postgres',
+  password: 'password',
   database: 'nestdb',
   autoLoadEntities: true, // auto imports all @Entity()s
   synchronize: true, // auto creates tables (disable in prod)
