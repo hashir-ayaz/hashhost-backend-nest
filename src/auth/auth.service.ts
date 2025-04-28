@@ -13,7 +13,10 @@ export class AuthService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  generateJwtToken(user: User | loginUserDto): string {
+  validateJwtToken() {
+    return true;
+  }
+  generateJwtToken(user: User): string {
     const payload = { email: user.email };
     const secret = process.env.JWT_SECRET ?? 'secrettt';
 

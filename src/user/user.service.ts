@@ -11,7 +11,7 @@ export class UserService {
   ) {}
 
   getUserById(id: string) {
-    return this.userRepository.findOne({ where: { id: +id } });
+    return this.userRepository.findOneBy({ id: id });
   }
 
   getAllUsers() {
