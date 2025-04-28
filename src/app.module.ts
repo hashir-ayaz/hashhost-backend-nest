@@ -8,6 +8,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { PrebuiltResourceModule } from './prebuilt-resource/prebuilt-resource.module';
 import { PrebuiltResourceInstanceModule } from './prebuilt-resource-instance/prebuilt-resource-instance.module';
 import { DockerModule } from './docker/docker.module';
+import { AuthModule } from './auth/auth.module';
+import { UserModule } from './user/user.module';
 
 const typeOrmConfig = TypeOrmModule.forRoot({
   type: 'postgres', // or 'mysql', 'sqlite', etc.
@@ -28,6 +30,8 @@ const typeOrmConfig = TypeOrmModule.forRoot({
     PrebuiltResourceModule,
     PrebuiltResourceInstanceModule,
     DockerModule,
+    AuthModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],
