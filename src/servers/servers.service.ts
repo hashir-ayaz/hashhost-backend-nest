@@ -3,16 +3,27 @@ import { CreateServerDto } from './dto/create-server.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Server } from './server.entity';
-
+import { InternalServerErrorException } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 @Injectable()
 export class ServersService {
+  private readonly logger = new Logger(ServersService.name);
   // will inject the repo class here
   constructor(
     @InjectRepository(Server)
     private readonly serverRepository: Repository<Server>,
   ) {}
   async createServer(createServerDto: CreateServerDto) {
-    return await this.serverRepository.save(createServerDto);
+    this.logger.log('Creating new server:', createServerDto);
+    try {
+      const newServer = this.serverRepository.create(createServerDto);
+      await this.serverRepository.save(newServer);
+      this.logger.log('Server created:', newServer);
+      return newServer;
+    } catch (error) {
+      this.logger.error('Failed to create server:', error.message, error.stack);
+      throw new InternalServerErrorException('Failed to create server');
+    }
   }
 
   async findAll() {

@@ -9,17 +9,39 @@ import {
 } from '@nestjs/common';
 import { ServersService } from './servers.service';
 import { CreateServerDto } from './dto/create-server.dto';
+import { InternalServerErrorException } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
+import { HttpCode, HttpStatus } from '@nestjs/common';
+
 @Controller('servers')
 export class ServersController {
-  constructor(private readonly serversService: ServersService) {}
+  constructor(
+    private readonly serversService: ServersService,
+    private readonly logger: Logger,
+  ) {}
 
   @Post()
-  createServer(@Body() body: CreateServerDto) {
-    return this.serversService.createServer(body);
+  @HttpCode(HttpStatus.CREATED)
+  async createServer(@Body() body: CreateServerDto) {
+    try {
+      const server = await this.serversService.createServer(body);
+      return {
+        message: 'Server created successfully',
+        server,
+      };
+    } catch (error) {
+      this.logger.error(
+        `Failed to create server: ${error.message}`,
+        error.stack,
+      );
+
+      throw new InternalServerErrorException('Failed to create server');
+    }
   }
 
   @Get()
-  findAll() {
+  @HttpCode(HttpStatus.OK)
+  async findAll() {
     return this.serversService.findAll();
   }
 
