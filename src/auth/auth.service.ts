@@ -1,85 +1,211 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  BadRequestException,
+  InternalServerErrorException,
+  ConflictException,
+  Logger,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { User } from '../user/entities/user.entity';
 import { loginUserDto } from './dto/login.dto';
 import { sign, SignOptions } from 'jsonwebtoken';
+import * as bcrypt from 'bcrypt';
+import { ConfigService } from '@nestjs/config';
+import * as ms from 'ms';
+import { StringValue } from 'ms';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly configService: ConfigService,
+    private readonly logger: Logger,
   ) {}
 
   validateJwtToken() {
     return true;
   }
+
   generateJwtToken(user: User): string {
-    const payload = { email: user.email };
-    const secret = process.env.JWT_SECRET ?? 'secrettt';
+    const payload = { sub: user.id, email: user.email };
+    const secret: string = this.configService.get<string>(
+      'JWT_SECRET',
+      'default-secret',
+    );
 
     if (!secret) {
-      throw new Error('JWT_SECRET not set');
+      throw new InternalServerErrorException('JWT configuration error');
     }
 
+    const expiresIn = (this.configService.get<string>('JWT_EXPIRATION') ||
+      '1h') as StringValue;
+
     const jwtOptions: SignOptions = {
-      expiresIn: '1h',
+      expiresIn: expiresIn,
     };
 
     try {
-      // Type assertion to handle the TypeScript error
       return sign(payload, secret, jwtOptions);
     } catch (err) {
-      if (err instanceof Error) {
-        console.error('Error signing JWT:', err.message);
-      } else {
-        console.error('Unknown error signing JWT:', err);
-      }
-      throw new Error('Token generation failed');
+      console.error(
+        'Error signing JWT:',
+        err instanceof Error ? err.message : err,
+      );
+      throw new InternalServerErrorException(
+        'Failed to generate authentication token',
+      );
     }
   }
 
   async login(user: loginUserDto) {
-    // check if user exists
-    const existingUser = await this.userRepository.findOne({
-      where: { email: user.email },
-    });
-    if (!existingUser) {
-      throw new Error('User not found');
-    }
-    // check if password is correct
-    if (existingUser.password !== user.password) {
-      throw new Error('Invalid password');
-    }
-    // Generate JWT token - pass existingUser instead of user
-    const token: string = this.generateJwtToken(existingUser);
+    this.logger.log('Login attempt:', user);
+    try {
+      // Input validation
+      if (!user.email || !user.password) {
+        this.logger.error('Email and password are required');
+        throw new BadRequestException('Email and password are required');
+      }
 
-    return {
-      message: 'Login successful',
-      user: existingUser,
-      token: token,
-    };
+      // Find user by email
+      const existingUser = await this.userRepository.findOne({
+        where: { email: user.email },
+      });
+
+      if (!existingUser) {
+        this.logger.error('Invalid credentials');
+        throw new UnauthorizedException('Invalid credentials');
+      }
+
+      // Check password - ideally should use bcrypt
+      // For backward compatibility, check if password is hashed
+      let isPasswordValid = false;
+
+      if (
+        existingUser.password.startsWith('$2b$') ||
+        existingUser.password.startsWith('$2a$')
+      ) {
+        // Password is hashed with bcrypt
+        isPasswordValid = await bcrypt.compare(
+          user.password,
+          existingUser.password,
+        );
+      } else {
+        // Legacy plaintext comparison - should be removed once all passwords are hashed
+        isPasswordValid = existingUser.password === user.password;
+      }
+
+      if (!isPasswordValid) {
+        this.logger.error('Invalid credentials');
+        throw new UnauthorizedException('Invalid credentials');
+      }
+
+      // Generate JWT token
+      const token: string = this.generateJwtToken(existingUser);
+
+      // Remove sensitive data before returning
+      const { password, ...userResult } = existingUser;
+
+      return {
+        message: 'Login successful',
+        user: userResult,
+        token: token,
+      };
+    } catch (error) {
+      // Re-throw NestJS HTTP exceptions
+      if (
+        error instanceof UnauthorizedException ||
+        error instanceof BadRequestException ||
+        error instanceof InternalServerErrorException
+      ) {
+        throw error;
+      }
+
+      // Log unexpected errors
+      console.error('Login error:', error);
+      throw new InternalServerErrorException('Authentication failed');
+    }
   }
 
   async register(newUser: CreateUserDto) {
-    const user: User = this.userRepository.create(newUser);
-    console.log('User object before saving:', user);
-    user.createdAt = new Date();
-    user.updatedAt = new Date();
-    let savedUser: User;
+    this.logger.log('Registering new user:', newUser);
     try {
-      savedUser = await this.userRepository.save(user);
+      // Input validation
+      if (!newUser.email || !newUser.password) {
+        this.logger.error('Email and password are required');
+        throw new BadRequestException('Email and password are required');
+      }
+
+      // Check if user already exists
+      const existingUser = await this.userRepository.findOne({
+        where: { email: newUser.email },
+      });
+
+      if (existingUser) {
+        this.logger.error('User already exists');
+        throw new ConflictException('User with this email already exists');
+      }
+
+      // Hash password
+      const saltRounds = 10;
+      const hashedPassword: string = await bcrypt.hash(
+        newUser.password,
+        saltRounds,
+      );
+
+      // Create user entity
+      const user: User = this.userRepository.create({
+        ...newUser,
+        password: hashedPassword,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+      this.logger.log('User created:', user);
+      // Save user to database
+      const savedUser = await this.userRepository.save(user);
+      this.logger.log('User saved:', savedUser);
+      // Generate JWT token
+      const token = this.generateJwtToken(savedUser);
+
+      // Remove sensitive data before returning
+      const { password, ...userResult } = savedUser;
+
+      this.logger.log('User registered:', userResult);
+      return {
+        message: 'User Signed Up Successfully',
+        user: userResult,
+        token: token,
+      };
     } catch (error) {
-      console.error('Error creating user:', error);
-      throw new Error('User creation failed');
+      // Re-throw NestJS HTTP exceptions
+      if (
+        error instanceof BadRequestException ||
+        error instanceof ConflictException ||
+        error instanceof InternalServerErrorException
+      ) {
+        throw error;
+      }
+
+      // Handle database constraints or unique violations
+      if (error.code === '23505') {
+        // PostgreSQL unique violation code
+        throw new ConflictException('User with this email already exists');
+      }
+
+      // Log the error
+      this.logger.error('Registration error:', error.message, error.stack);
+      throw new InternalServerErrorException('Registration failed');
     }
-    const token = this.generateJwtToken(savedUser);
+  }
+
+  logout() {
+    // In a JWT-based auth system, the client typically handles logout by removing the token
+    // The server doesn't need to do anything special, but we can implement token blacklisting here if needed
     return {
-      message: 'User Signed Up Successfully',
-      user: savedUser,
-      token: token,
+      message: 'Logged out successfully',
     };
   }
 }

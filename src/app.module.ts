@@ -10,6 +10,7 @@ import { PrebuiltResourceInstanceModule } from './prebuilt-resource-instance/pre
 import { DockerModule } from './docker/docker.module';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
+import { ConfigModule } from '@nestjs/config';
 
 const typeOrmConfig = TypeOrmModule.forRoot({
   type: 'postgres', // or 'mysql', 'sqlite', etc.
@@ -21,9 +22,11 @@ const typeOrmConfig = TypeOrmModule.forRoot({
   autoLoadEntities: true, // auto imports all @Entity()s
   synchronize: true, // auto creates tables (disable in prod)
 });
-
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true, // Make the configuration globally available
+    }),
     ServersModule,
     ProjectsModule,
     typeOrmConfig,
