@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { Server } from './server.entity';
 import { InternalServerErrorException } from '@nestjs/common';
 import { Logger } from '@nestjs/common';
+import { generateSSHKeyPair } from './ssh.service';
 @Injectable()
 export class ServersService {
   private readonly logger = new Logger(ServersService.name);
@@ -23,6 +24,17 @@ export class ServersService {
     } catch (error) {
       this.logger.error('Failed to create server:', error.message, error.stack);
       throw new InternalServerErrorException('Failed to create server');
+    }
+  }
+
+  generatePublicPrivateKeyPair() {
+    try {
+      const keyPair = generateSSHKeyPair();
+      this.logger.log('SSH key pair generated:', keyPair);
+      return keyPair;
+    } catch (error) {
+      this.logger.error('Failed to generate SSH key pair:', error.message);
+      throw new InternalServerErrorException('Failed to generate SSH key pair');
     }
   }
 

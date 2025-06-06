@@ -39,6 +39,11 @@ export class ServersController {
     }
   }
 
+  @Post('generate-ssh-key-pair')
+  async generateSSHKeyPair() {
+    return this.serversService.generatePublicPrivateKeyPair();
+  }
+
   @Get()
   @HttpCode(HttpStatus.OK)
   async findAll() {
