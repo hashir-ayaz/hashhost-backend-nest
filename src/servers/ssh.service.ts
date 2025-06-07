@@ -49,8 +49,8 @@ export function generateSSHKeyPair(comment = 'generated@nodejs') {
 
   // 3) Save both keys to disk.
   //    Private key: mode 0o600 so only owner can read/write.
-  fs.writeFileSync('id_rsa', pemPriv, { mode: 0o600 });
-  fs.writeFileSync('id_rsa.pub', sshPub);
+  fs.writeFileSync(`${process.env.HOME}/.ssh/id_rsa`, pemPriv, { mode: 0o600 });
+  fs.writeFileSync(`${process.env.HOME}/.ssh/id_rsa.pub`, sshPub);
 
   return {
     privateKey: pemPriv,

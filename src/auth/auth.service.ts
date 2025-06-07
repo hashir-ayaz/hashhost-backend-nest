@@ -81,34 +81,32 @@ export class AuthService {
       }
 
       // Check password - ideally should use bcrypt
-      // For backward compatibility, check if password is hashed
-      let isPasswordValid = false;
 
-      if (
-        existingUser.password.startsWith('$2b$') ||
-        existingUser.password.startsWith('$2a$')
-      ) {
-        // Password is hashed with bcrypt
-        isPasswordValid = await bcrypt.compare(
-          user.password,
+      this.logger.log(
+        'comparing password ' +
+          user.password +
+          ' with ' +
           existingUser.password,
-        );
-      } else {
-        // Legacy plaintext comparison - should be removed once all passwords are hashed
-        isPasswordValid = existingUser.password === user.password;
-      }
+      );
+      const isPasswordValid = await bcrypt.compare(
+        user.password,
+        existingUser.password,
+      );
+      this.logger.log('isPasswordValid ' + isPasswordValid);
 
       if (!isPasswordValid) {
         this.logger.error('Invalid credentials');
         throw new UnauthorizedException('Invalid credentials');
       }
-
+      this.logger.log('✅ Password OK — about to sign JWT and return');
       // Generate JWT token
       const token: string = this.generateJwtToken(existingUser);
+      this.logger.log('JWT token generated: ' + token);
 
       // Remove sensitive data before returning
       const { password, ...userResult } = existingUser;
 
+      this.logger.log('✅ Returning from login:', { userResult, token });
       return {
         message: 'Login successful',
         user: userResult,
