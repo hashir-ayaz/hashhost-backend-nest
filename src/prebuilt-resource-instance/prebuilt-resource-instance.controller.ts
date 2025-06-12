@@ -10,11 +10,15 @@ import {
 import { PrebuiltResourceInstanceService } from './prebuilt-resource-instance.service';
 import { CreatePrebuiltResourceInstanceDto } from './dto/create-prebuilt-resource-instance.dto';
 import { UpdatePrebuiltResourceInstanceDto } from './dto/update-prebuilt-resource-instance.dto';
+import { renderCompose } from 'src/utils/template-processing-utils';
+import { dummyConfigData } from 'src/utils/dummy_data';
+import { Logger } from '@nestjs/common';
 
 @Controller('prebuilt-resource-instance')
 export class PrebuiltResourceInstanceController {
   constructor(
     private readonly prebuiltResourceInstanceService: PrebuiltResourceInstanceService,
+    private readonly logger: Logger,
   ) {}
 
   @Post()
@@ -26,6 +30,26 @@ export class PrebuiltResourceInstanceController {
     return this.prebuiltResourceInstanceService.create(
       createPrebuiltResourceInstanceDto,
     );
+  }
+
+  @Post('/docker-compose')
+  createDockerComposeAndDeploy(@Body() body: any) {
+    this.logger.log('Creating docker compose and deploying');
+    const resourceId: number = body.resourceId;
+    // using dummy data to find the config and output paths
+    const configData = dummyConfigData.find(
+      (data) => data.serviceId === resourceId,
+    );
+    if (!configData) {
+      throw new Error('Config data not found');
+    }
+    renderCompose(
+      body.config,
+      configData.pathToConfig,
+      configData.pathToOutput,
+    );
+    this.logger.log('Docker compose created and deployed');
+    return 'Docker compose created and deployed';
   }
 
   @Get()

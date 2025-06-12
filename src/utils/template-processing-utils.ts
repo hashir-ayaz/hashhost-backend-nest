@@ -14,7 +14,7 @@ Handlebars.registerHelper('concat', (...args: any[]) => {
   return args.join('');
 });
 
-async function renderCompose(
+export async function renderCompose(
   config: Record<string, any>,
   templatePath: string,
   outputPath: string,
@@ -26,32 +26,32 @@ async function renderCompose(
   console.log(`Wrote ${outputPath}`);
 }
 
-async function main() {
-  const userConfig = {
-    serviceName: 'mydb-mongo',
-    mongoVersion: '6.0',
-    containerName: 'project-mongo',
-    restartPolicy: 'on-failure',
-    hostPort: '27018',
-    dataVolume: 'mydb_data',
-    rootUsername: 'admin',
-    rootPassword: 's3cr3t',
-    initDatabase: 'users',
-    timeZone: 'Asia/Karachi',
-    networkName: 'mypaas-net',
-    isNetworkExternal: true,
-  };
+// async function main() {
+//   const userConfig = {
+//     serviceName: 'mydb-mongo',
+//     mongoVersion: '6.0',
+//     containerName: 'project-mongo',
+//     restartPolicy: 'on-failure',
+//     hostPort: '27018',
+//     dataVolume: 'mydb_data',
+//     rootUsername: 'admin',
+//     rootPassword: 's3cr3t',
+//     initDatabase: 'users',
+//     timeZone: 'Asia/Karachi',
+//     networkName: 'mypaas-net',
+//     isNetworkExternal: true,
+//   };
 
-  // __dirname works out-of-the-box here:
-  await renderCompose(
-    userConfig,
-    // path.join(__dirname, 'mongo-template.yaml'),
-    '/home/hashir/hashhost-backend-nest/src/templates/docker-compose/mongo-template.yaml',
-    '/home/hashir/hashhost-backend-nest/src/templates/docker-compose/docker-compose.yml',
-  );
-}
+//   // __dirname works out-of-the-box here:
+//   await renderCompose(
+//     userConfig,
+//     // path.join(__dirname, 'mongo-template.yaml'),
+//     '/home/hashir/hashhost-backend-nest/src/templates/docker-compose/mongo-template.yaml',
+//     '/home/hashir/hashhost-backend-nest/src/templates/docker-compose/docker-compose.yml',
+//   );
+// }
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+// main().catch((err) => {
+//   console.error(err);
+//   process.exit(1);
+// });

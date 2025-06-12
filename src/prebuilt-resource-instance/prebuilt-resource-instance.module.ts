@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 import { PrebuiltResourceInstanceService } from './prebuilt-resource-instance.service';
 import { PrebuiltResourceInstanceController } from './prebuilt-resource-instance.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -11,6 +11,6 @@ import { PrebuiltResource } from 'src/prebuilt-resource/entities/prebuilt-resour
     DockerModule,
   ],
   controllers: [PrebuiltResourceInstanceController],
-  providers: [PrebuiltResourceInstanceService],
+  providers: [PrebuiltResourceInstanceService, Logger],
 })
 export class PrebuiltResourceInstanceModule {}
