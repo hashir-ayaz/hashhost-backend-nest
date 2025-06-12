@@ -149,10 +149,10 @@ export class AuthService {
 
       // Hash password
       const saltRounds = 10;
-      const hashedPassword: string = await bcrypt.hash(
+      const hashedPassword: string = (await bcrypt.hash(
         newUser.password,
         saltRounds,
-      );
+      )) as string;
 
       // Create user entity
       const user: User = this.userRepository.create({

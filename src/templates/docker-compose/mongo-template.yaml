@@ -1,0 +1,32 @@
+{{!-- mongo.hbs --}}
+version: '3.8'
+
+services:
+  {{serviceName}}:               # e.g., mydb-mongo
+    image: mongo:{{default mongoVersion 'latest'}}
+    container_name: {{default containerName serviceName}}
+    restart: {{default restartPolicy 'unless-stopped'}}
+    ports:
+      - "{{default hostPort '27017'}}:27017"
+    volumes:
+      - {{default dataVolume (concat serviceName '_data')}}:/data/db
+    environment:
+      {{#if rootUsername}}
+      MONGO_INITDB_ROOT_USERNAME: {{rootUsername}}
+      {{/if}}
+      {{#if rootPassword}}
+      MONGO_INITDB_ROOT_PASSWORD: {{rootPassword}}
+      {{/if}}
+      {{#if initDatabase}}
+      MONGO_INITDB_DATABASE: {{initDatabase}}
+      {{/if}}
+      TZ: {{default timeZone 'Etc/UTC'}}
+    networks:
+      - {{default networkName 'coolify-default'}}
+
+volumes:
+  {{default dataVolume (concat serviceName '_data')}}:
+
+networks:
+  {{default networkName 'coolify-default'}}:
+    external: {{default isNetworkExternal false}}
