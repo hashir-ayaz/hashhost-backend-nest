@@ -1,0 +1,26 @@
+{{! nginx.hbs }}
+version: '3.8' services:
+{{serviceName}}: image: nginx:{{default nginxVersion 'latest'}}
+container_name:
+{{default containerName serviceName}}
+restart:
+{{default restartPolicy 'unless-stopped'}}
+ports: - "{{default httpPort '80'}}:80" - "{{default httpsPort '443'}}:443"
+volumes: -
+{{default configVolume (concat serviceName '_config')}}:/etc/nginx/nginx.conf
+{{#if certsVolume}}
+  -
+  {{default certsVolume (concat serviceName '_certs')}}:/etc/nginx/certs
+{{/if}}
+networks: -
+{{default networkName 'coolify-default'}}
+
+volumes:
+{{default configVolume (concat serviceName '_config')}}:
+{{#if certsVolume}}
+  {{default certsVolume (concat serviceName '_certs')}}:
+{{/if}}
+
+networks:
+{{default networkName 'coolify-default'}}: external:
+{{default isNetworkExternal false}}

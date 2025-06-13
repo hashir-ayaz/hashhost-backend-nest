@@ -1,0 +1,17 @@
+{{! prometheus.hbs }}
+version: '3.8' services:
+{{serviceName}}: image: prom/prometheus:{{default prometheusVersion 'latest'}}
+container_name:
+{{default containerName serviceName}}
+restart:
+{{default restartPolicy 'unless-stopped'}}
+ports: - "{{default hostPort '9090'}}:9090" volumes: -
+{{default configVolume (concat serviceName '_config')}}:/etc/prometheus -
+{{default dataVolume (concat serviceName '_data')}}:/prometheus networks: -
+{{default networkName 'coolify-default'}}
+
+volumes:
+{{default configVolume (concat serviceName '_config')}}:
+{{default dataVolume (concat serviceName '_data')}}: networks:
+{{default networkName 'coolify-default'}}: external:
+{{default isNetworkExternal false}}

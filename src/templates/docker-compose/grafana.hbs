@@ -1,0 +1,19 @@
+{{! grafana.hbs }}
+version: '3.8' services:
+{{serviceName}}: image: grafana/grafana:{{default grafanaVersion 'latest'}}
+container_name:
+{{default containerName serviceName}}
+restart:
+{{default restartPolicy 'unless-stopped'}}
+ports: - "{{default hostPort '3000'}}:3000" volumes: -
+{{default dataVolume (concat serviceName '_data')}}:/var/lib/grafana
+environment: GF_SECURITY_ADMIN_USER: "{{default adminUser 'admin'}}"
+GF_SECURITY_ADMIN_PASSWORD: "{{default adminPassword 'admin'}}" TZ:
+{{default timeZone 'Etc/UTC'}}
+networks: -
+{{default networkName 'coolify-default'}}
+
+volumes:
+{{default dataVolume (concat serviceName '_data')}}: networks:
+{{default networkName 'coolify-default'}}: external:
+{{default isNetworkExternal false}}

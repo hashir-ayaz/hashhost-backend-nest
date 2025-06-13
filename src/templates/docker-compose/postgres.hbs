@@ -1,0 +1,21 @@
+{{! postgres.hbs }}
+version: '3.8' services:
+{{serviceName}}: image: postgres:{{default postgresVersion 'latest'}}
+container_name:
+{{default containerName serviceName}}
+restart:
+{{default restartPolicy 'unless-stopped'}}
+ports: - "{{default hostPort '5432'}}:5432" volumes: -
+{{default dataVolume (concat serviceName '_data')}}:/var/lib/postgresql/data
+environment: POSTGRES_USER: "{{default dbUser 'postgres'}}" POSTGRES_PASSWORD: "{{default
+  dbPassword
+  'postgres'
+}}" POSTGRES_DB: "{{default dbName 'postgres'}}" TZ:
+{{default timeZone 'Etc/UTC'}}
+networks: -
+{{default networkName 'coolify-default'}}
+
+volumes:
+{{default dataVolume (concat serviceName '_data')}}: networks:
+{{default networkName 'coolify-default'}}: external:
+{{default isNetworkExternal false}}

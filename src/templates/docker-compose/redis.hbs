@@ -1,0 +1,19 @@
+{{! redis.hbs }}
+version: '3.8' services:
+{{serviceName}}: image: redis:{{default redisVersion 'latest'}}
+container_name:
+{{default containerName serviceName}}
+restart:
+{{default restartPolicy 'unless-stopped'}}
+ports: - "{{default hostPort '6379'}}:6379" volumes: -
+{{default dataVolume (concat serviceName '_data')}}:/data environment:
+{{#if password}}
+  REDIS_PASSWORD: "{{password}}"
+{{/if}}
+networks: -
+{{default networkName 'coolify-default'}}
+
+volumes:
+{{default dataVolume (concat serviceName '_data')}}: networks:
+{{default networkName 'coolify-default'}}: external:
+{{default isNetworkExternal false}}
