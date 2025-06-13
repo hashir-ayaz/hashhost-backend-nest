@@ -1,0 +1,16 @@
+version: '3.8' services:
+my-redis: image: redis:7.0
+container_name:
+project-redis
+restart:
+on-failure
+ports: - "6379:6379" volumes: -
+redis_data:/data environment:
+  REDIS_PASSWORD: "s3cr3t"
+networks: -
+mypaas-net
+
+volumes:
+redis_data: networks:
+mypaas-net: external:
+true
